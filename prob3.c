@@ -23,12 +23,37 @@ ino_t returnINODE(const char *path) {
 }
 
 time_t returnModificationTime(const char *path) {
-    struct stat attr;
-    if (stat(path, &attr) != 0)
+  struct stat attr;
+  if (stat(path, &attr) != 0)
       return 0;
-    return attr.st_mtime;
+  return attr.st_mtime;
 }
 
+int checkCorrupted(const char *path) {
+  FILE *fp = fopen(path, "r");
+  if (!fp) {
+    printf("Can't open file\n");
+    return 0;
+  }
+  int countLines = 0;
+  int countWords = 0;
+  int countChars = 0;
+  char *line = NULL;
+  size_t len = 0;
+  ssize_t read;
+
+    while ((read = getline(&line, &len, fp)) != -1) {
+        for(int i = 0; line[i]; i++) {
+          countChars++;
+          if(line[i] == ' ') countWords++;
+        }
+        countLines++;
+    }
+
+  if(countLines < 3 && countWords > 1000 && countChars > 2000)
+    printf("%s is suspicios\n", path);
+  
+}
 
 void Open(char *dirname) {
     DIR *dir = opendir(dirname);
@@ -49,8 +74,8 @@ void Open(char *dirname) {
               char file_name[100];
               strcpy(file_name, d->d_name);
               strcat(file_name, "_snapshot");
+              checkCorrupted(s);
               FILE *fp;
-
               fp = fopen (file_name, "w");
               if(!fp) {
                 printf("Could't open file: %s ", file_name);
