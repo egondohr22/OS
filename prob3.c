@@ -22,17 +22,16 @@ void Open(char *dirname) {
     struct dirent *d;
     while ((d = readdir(dir)) != NULL) {
         if(strcmp(d->d_name, "..") && strcmp(d->d_name, ".")) {
-            printf("%s\n", d->d_name);
             char s[100];
             strcpy(s, dirname);
             strcat(s, "/");
             strcat(s, d->d_name);
-            printf("---%s\n", s);
             if(isDirectory(s))
               Open(s);
             else {
+              printf("%s\n", s);
               char file_name[100];
-              strcat(file_name, d->d_name);
+              strcpy(file_name, d->d_name);
               strcat(file_name, "_snapshot");
               FILE *fp;
               fp = fopen (file_name, "w");
@@ -47,11 +46,7 @@ void Open(char *dirname) {
 
 int main(int argc, char **argv)
 {
-    // if(argc!=2)
-    // {
-    //   printf("Send one parameter!\n");
-    //   exit(-1);
-    // }
+
     for(int i = 1; i < argc; i++) {
       Open(argv[i]);
     }
