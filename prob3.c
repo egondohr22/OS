@@ -69,14 +69,21 @@ void Open(char *dirname) {
     }
 }
 
-
-
 int main(int argc, char **argv)
 {
 
     for(int i = 1; i < argc; i++) {
-      Open(argv[i]);
+      pid_t pid = fork();
+
+      if(pid == -1) {
+        perror("fork");
+        exit(-1);
+      }
+      else if(pid == 0) {
+        printf("Child process for %s with PID: %d\n", argv[i], getpid());
+        Open(argv[i]);
+        exit(EXIT_SUCCESS);
+      }
     }
- 
     return 0;
 }
